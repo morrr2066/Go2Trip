@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Create a Trip</h2>
+<form method="post" novalidate>
+  {% csrf_token %}
+
+  <div class="mb-3">
+    {{ form.title.label_tag }}
+    {{ form.title }}
+    {% if form.title.errors %}
+      <div class="text-danger small">{{ form.title.errors }}</div>
+    {% endif %}
+  </div>
+
+  <div class="mb-3">
+    {{ form.max_persons.label_tag }}
+    {{ form.max_persons }}
+    {% if form.max_persons.errors %}
+      <div class="text-danger small">{{ form.max_persons.errors }}</div>
+    {% endif %}
+  </div>
+
+  <div class="mb-3">
+    {{ form.price.label_tag }}
+    {{ form.price }}
+    {% if form.price.errors %}
+      <div class="text-danger small">{{ form.price.errors }}</div>
+    {% endif %}
+  </div>
+
+  <div class="mb-3">
+    {{ form.trip_date.label_tag }}
+    {{ form.trip_date }}
+    {% if form.trip_date.errors %}
+      <div class="text-danger small">{{ form.trip_date.errors }}</div>
+    {% endif %}
+  </div>
+
+  <div class="mb-3">
+    {{ form.destinations.label_tag }}
+    {{ form.destinations }}
+    {% if form.destinations.errors %}
+      <div class="text-danger small">{{ form.destinations.errors }}</div>
+    {% endif %}
+  </div>
+
+  <div class="mb-3">
+    {{ form.contact_info.label_tag }}
+    {{ form.contact_info }}
+    {% if form.contact_info.errors %}
+      <div class="text-danger small">{{ form.contact_info.errors }}</div>
+    {% endif %}
+  </div>
+
+  <button type="submit" class="btn btn-primary">Create Trip</button>
+</form>
+{% endblock %}

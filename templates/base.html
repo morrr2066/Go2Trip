@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Go2Trip</title>
+
+    <!-- Your custom CSS only -->
+    <link rel="stylesheet" href="{% static 'trips/style.css' %}">
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">Go2Trip</a>
+
+        <form method="get" action="{% url 'trip_search' %}" role="search">
+            <input type="search" name="q" placeholder="Search trips..." value="{{ request.GET.q }}">
+            <button type="submit">Search</button>
+        </form>
+
+        <div>
+          <ul>
+            {% if user.is_authenticated %}
+              <li>
+                  <a href="{% url 'profile' %}" class="profile-link">
+                    <img
+                      src="{{ user.profile.profile_picture.url|default:'/static/user-circle.png' }}"
+                      alt="Profile Picture"
+                      class="profile-pic"
+                      onerror="this.src='/static/user-circle.png';"
+                    />                    Hi, {{ user.first_name }}
+                  </a>
+              </li>
+              <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+              <li><a href="{% url 'login' %}">Login</a></li>
+              <li><a href="{% url 'signup' %}">Sign up</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="container my-4">
+      {% block content %}
+      {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>&copy; 2025 Go2Trip. All rights reserved.</p>
+    </footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>

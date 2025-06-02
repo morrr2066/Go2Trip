@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load static %}
+<div id="profile-trips">
+  <ul id="home-trips-list">
+    {% for trip in trips %}
+      <li class="trip-card" style="position: relative; padding-left: 80px;">
+
+        <strong>{{ trip.title }}</strong><br>
+        {{ trip.trip_date|date:"d/m/Y" }}<br>
+        {{ trip.price }} EGP<br>
+        {{ trip.destinations }}<br>
+        Contact: {{ trip.contact_info }}<br>
+        {{ trip.max_persons }}<br>
+        {{ trip.creator.first_name }}
+
+        <img
+          src="{{ trip.creator.profile.profile_picture.url|default:'' }}"
+          alt="Profile Picture"
+          style="
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            position: absolute;
+            bottom: 180px;
+            left: -25px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+          "
+          onerror="this.src='{% static 'user-circle.png' %}';"
+        />
+
+      </li>
+    {% empty %}
+      <li>No trips available.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% if user.is_authenticated %}
+  <a href="{% url 'create' %}" class="add-trip-button" title="Add Trip">+</a>
+{% endif %}
+{% endblock %}
