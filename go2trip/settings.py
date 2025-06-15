@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+import dj_database_url
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -67,15 +69,13 @@ WSGI_APPLICATION = 'go2trip.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'trip2go',
-        'USER': 'postgres',
-        'PASSWORD': '2691999Mm',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(
+        default='postgresql://go2trip_db_user:imsyBotsOkaCrQicTwupT6854QwGLwSO@dpg-d17cjh2dbo4c73fpncdg-a.frankfurt-postgres.render.com/go2trip_db',
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
 
 
