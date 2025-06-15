@@ -25,9 +25,9 @@ LOGIN_URL = '/users/login/'  # or wherever your login URL is
 SECRET_KEY = 'django-insecure-u%m*6x#fnr_vqi)1=ei^ts75c4l__7)%eo3ve*0bh-#@3scza2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['go2trip.onrender.com']
 
 
 # Application definition
