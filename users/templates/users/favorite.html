@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+{% block content %}
+
+
+<div class="profile-compact-container">
+  <div class="profile-compact-top">
+    {% if user.profile.profile_picture %}
+      <img src="{{ user.profile.profile_picture.url }}"
+           class="profile-compact-img"
+           onerror="this.src='{% static 'user-circle.png' %}'">
+    {% else %}
+      <img src="{% static 'user-circle.png' %}"
+           class="profile-compact-img">
+    {% endif %}
+
+    <div class="profile-compact-info">
+
+
+      <div style="display: flex; align-items: center; gap: 10px;">
+      <h2>{{ user.get_full_name|default:user.username }}</h2>
+        {% if user.profile.is_verified %}
+          <img
+          src="{% static 'verified.png' %}"
+          alt="verified"
+          class="verified"
+        />
+        {% endif %}
+      <button id="edit-profile-btn" class="compact-edit-btn">
+        <img
+          src="{% static 'user-round-pen.png' %}"
+          alt="edit-profile"
+          class="edit-profile-img"
+        />
+      </button>
+      </div>
+      <p class="compact-bio">{{ user.profile.bio|default:"Add Bio." }}</p>
+      <div class="social-media-pf">
+      {% if user.profile.facebook_url %}
+        <a href="{{ user.profile.facebook_url }}" target="_blank">
+          <img src="{% static 'facebook-icon.png' %}" alt="Facebook" style="width:24px; height:24px;">
+        </a>
+      {% endif %}
+      {% if user.profile.instagram_url %}
+        <a href="{{ user.profile.instagram_url }}" target="_blank">
+          <img src="{% static 'instagram-icon.png' %}" alt="Instagram" style="width:24px; height:24px;">
+        </a>
+      {% endif %}
+      {% if user.profile.whatsapp_number %}
+        <a href="https://wa.me/{{ user.profile.whatsapp_number }}" target="_blank">
+          <img src="{% static 'whatsapp-icon.png' %}" alt="WhatsApp" style="width:24px; height:24px;">
+        </a>
+      {% endif %}
+      {% if user.profile.phone_number %}
+        <a href="tel:{{ user.profile.phone_number }}">
+          <img src="{% static 'phone-icon.png' %}" alt="Phone" style="width:24px; height:24px;">
+        </a>
+      {% endif %}
+        </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="trips-container">
+    <h2 class="trips-header">My Favourites</h2>
+  <hr><br>
+  <div class="trips-grid">
+    {% for trip in favorites %}
+    <div class="trip-card-container">
+      {% include "partials/trip_card.html" with hide_creator=True%}
+        {% empty %}
+          <div class="no-trips-message">No trips found.</div>
+        {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+  <div id="edit-profile-modal" style="display:none; position:fixed; top:0; left:0;
+    width:100%; height:100%; background:rgba(0,0,0,0.5);
+    justify-content:center; align-items:center;">
+    <div style="background:white; padding:20px; border-radius:8px; width:400px; position:relative;">
+      <button id="close-modal" style="position:absolute; top:10px; right:10px;">X</button>
+      <h3>Edit Profile</h3>
+      <form id="edit-profile-form" method="POST" action="{% url 'edit_profile' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="bio">Bio:</label><br>
+        <textarea name="bio" id="bio" rows="3">{{ user.profile.bio }}</textarea><br><br>
+        <label for="profile_picture">Profile Picture:</label><br>
+        <input type="file" name="profile_picture" id="profile_picture"><br><br>
+        <button type="submit">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block search %}
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+  // Modal logic
+  const editBtn = document.getElementById('edit-profile-btn');
+  const modal = document.getElementById('edit-profile-modal');
+  const closeBtn = document.getElementById('close-modal');
+
+  editBtn.onclick = () => {
+    modal.style.display = 'flex';
+  }
+
+  closeBtn.onclick = () => {
+    modal.style.display = 'none';
+  }
+
+  window.onclick = (event) => {
+    if (event.target == modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  // Optional: Remove favorite button (you need to implement endpoint)
+  document.querySelectorAll('.remove-favorite-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      const tripId = button.dataset.tripId;
+      fetch(`/toggle-favorite/${tripId}/`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": getCookie('csrftoken')
+        },
+        body: `trip_id=${tripId}`
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          button.closest('li').remove();
+        } else {
+          alert('Failed to remove favorite');
+        }
+      })
+      .catch(() => alert('Network error'));
+    });
+  });
+
+  // CSRF helper
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+{% endblock %}

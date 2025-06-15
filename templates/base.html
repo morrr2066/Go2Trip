@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Go2Trip</title>
+    <title>Trips</title>
 
     <!-- Your custom CSS only -->
     <link rel="stylesheet" href="{% static 'trips/style.css' %}">
@@ -14,27 +14,99 @@
     <!-- Navbar -->
     <nav class="navbar">
       <div class="container">
-        <a class="navbar-brand" href="{% url 'home' %}">Go2Trip</a>
+        <a class="navbar-brand" href="{% url 'home' %}">Trip
+            <img
+                      src="{% static 'logo.png' %}"
+                      alt="logo"
+                      class="logo"
+                      style="margin-right: 0px;"
+                    />
+        Go</a>
+          {% block search %}
+           {% block h2 %}
+        {% if user.is_authenticated %}
+        <div class="where">
+            <h1>Where do you want to go , {{user.first_name}} ?</h1>
+        </div>
+        {% else %}
+         <div class="where">
+            <h1>Get ready for an experience !</h1>
+         </div>
+        {% endif %}
+        {% endblock %}
 
-        <form method="get" action="{% url 'trip_search' %}" role="search">
-            <input type="search" name="q" placeholder="Search trips..." value="{{ request.GET.q }}">
-            <button type="submit">Search</button>
-        </form>
+
+              <form class="search-form" method="get" action="{% url 'trip_search' %}" role="search">
+                <input type="search" name="q" placeholder="Search trips..." value="{{ request.GET.q }}">
+                <button type="submit">Search</button>
+              </form>
+
+<div class="filter" style="display: flex; align-items: center; gap: 10px;">
+
+  <a id="toggle-filter-btn"  >
+    <img
+      src="{% static 'filter.png' %}"
+      alt="filter"
+      class="filter"
+    />
+  </a>
+</div>
+
+<!-- Filter Modal -->
+<div id="filterModal" class="filter-modal-36" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5); z-index: 1000;">
+  <div class="modal-content" style="background: white; padding: 20px; width: 90%; max-width: 500px;
+    margin: 100px auto; position: relative; border-radius: 10px;">
+
+    <span id="close-filter-modal" class="close" style="position: absolute; top: 10px; right: 20px;
+      font-size: 24px; cursor: pointer;">&times;</span>
+
+    <h2>Apply Filters</h2>
+    <form method="get" action="{% url 'trip_search' %}">
+      {{ filter.form.as_p }}
+      <button type="submit" style="padding: 6px 12px; font-weight: bold;">Apply Filters</button>
+    </form>
+  </div>
+</div>
+            {% endblock %}
+
+
 
         <div>
           <ul>
             {% if user.is_authenticated %}
-              <li>
-                  <a href="{% url 'profile' %}" class="profile-link">
+              <li class="profile-link">
+                  <a href="{% url 'profile' %}" >
                     <img
-                      src="{{ user.profile.profile_picture.url|default:'/static/user-circle.png' }}"
+                      src="{{ user.profile.profile_picture.url|default:'/static/user.png' }}"
                       alt="Profile Picture"
                       class="profile-pic"
-                      onerror="this.src='/static/user-circle.png';"
-                    />                    Hi, {{ user.first_name }}
+                      style="margin-right: 10px;"
+                      onerror="this.src='/static/user.png';"
+                    />
                   </a>
               </li>
-              <li><a href="{% url 'logout' %}">Logout</a></li>
+              <li class="favv">
+                <a href="{% url 'favorites' %}" >
+                    <img
+                      src="{% static 'heart-navbar.png' %}"
+                      alt="Favorites"
+                      class="profile-heart"
+                      style="margin-right: 0px;"
+                    />
+                </a>
+              </li>
+
+              <li>
+                  <a href="{% url 'logout' %}">
+                      <img
+                      src="{% static 'door-open.png' %}"
+                      alt="door-open"
+                      class="profile-door"
+                      style="margin-right: 0px;"
+                    />
+                  </a>
+              </li>
             {% else %}
               <li><a href="{% url 'login' %}">Login</a></li>
               <li><a href="{% url 'signup' %}">Sign up</a></li>
@@ -50,10 +122,91 @@
       {% endblock %}
     </main>
 
+    {% block footer %}
     <!-- Footer -->
-    <footer class="footer">
-      <p>&copy; 2025 Go2Trip. All rights reserved.</p>
-    </footer>
-{% block scripts %}{% endblock %}
+      <footer class="footer">
+        <p>&copy; 2025 Go2Trip. All rights reserved.</p>
+      </footer>
+      {% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Handle heart icon toggle
+    document.body.addEventListener("click", (e) => {
+      const icon = e.target.closest(".toggle-heart");
+      if (!icon) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const tripId = icon.dataset.tripId;
+      const outline = icon.dataset.outline;
+      const filled = icon.dataset.filled;
+
+      fetch(`/toggle-favorite/${tripId}/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": getCookie('csrftoken')
+        },
+        body: `trip_id=${tripId}`
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          icon.src = data.favorited ? filled : outline;
+        } else {
+          alert("Error toggling favorite");
+        }
+      })
+      .catch(() => alert("Network error"));
+    });
+
+    // 🔥 Filter modal open/close handlers
+    const toggleBtn = document.getElementById("toggle-filter-btn");
+    const filterModal = document.getElementById("filterModal");
+    const closeFilterBtn = document.getElementById("close-filter-modal");
+
+    if (toggleBtn && filterModal) {
+      toggleBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        filterModal.style.display = "block";
+      });
+    }
+
+    if (closeFilterBtn && filterModal) {
+      closeFilterBtn.addEventListener("click", () => {
+        filterModal.style.display = "none";
+      });
+    }
+
+    // Optional: close modal when clicking outside of it
+    window.addEventListener("click", (e) => {
+      if (e.target === filterModal) {
+        filterModal.style.display = "none";
+      }
+    });
+  });
+
+  // CSRF helper
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+{% endblock %}
+
+
 </body>
 </html>

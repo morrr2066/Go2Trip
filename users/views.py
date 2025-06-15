@@ -4,7 +4,6 @@ from .forms import LoginForm, SignUpForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from trips.models import Trip
-from .models import Profile
 
 def signup(request):
     if request.method == 'POST':
@@ -46,24 +45,39 @@ def logout_view(request):
 @login_required
 def profile_view(request):
     user_trips = Trip.objects.filter(creator=request.user)
+    print('show_search in context:', False)
     return render(request, 'users/profile.html', {
         'user': request.user,
-        'trips': user_trips
+        'trips': user_trips,
+
     })
 
 @login_required
 def edit_profile(request):
     if request.method == 'POST':
-        bio = request.POST.get('bio', '')
-        profile_picture = request.FILES.get('profile_picture')
-
         profile = request.user.profile
-        profile.bio = bio
 
-        if profile_picture:
-            profile.profile_picture = profile_picture
+        profile.bio = request.POST.get('bio', '')
+        profile.facebook_url = request.POST.get('facebook_url', '')
+        profile.instagram_url = request.POST.get('instagram_url', '')
+        profile.whatsapp_number = request.POST.get('whatsapp_number', '')
+        profile.phone_number = request.POST.get('phone_number', '')
+
+        if 'profile_picture' in request.FILES:
+            profile.profile_picture = request.FILES['profile_picture']
 
         profile.save()
-        return redirect('profile')  # assuming 'profile' is your profile page URL name
+        return redirect('profile')
 
     return redirect('profile')
+
+@login_required
+def favorites_view(request):
+    # Assuming you have a ManyToManyField on Profile or User linking favorites
+    # Example: user.profile.favorites (related name to Trip objects)
+    favorites = request.user.profile.favorites.all()
+
+    return render(request, 'users/favorite.html', {
+        'user': request.user,
+        'favorites': favorites
+    })

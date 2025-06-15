@@ -1,0 +1,1 @@
+web: gunicorn go2trip.wsgi

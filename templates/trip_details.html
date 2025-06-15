@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load static %}
+{% load humanize %}
+
+<div class="center-wrapper">
+  <div class="trip-card-dt">
+            <!-- Trip Image and wrapper for the detailed trip -->
+              <div class="trip-img-dt">
+                {% if trip.trip_picture %}
+                  <img src="{{ trip.trip_picture.url }}" alt="{{ trip.title }}" class="trip-img__image" />
+                {% else %}
+                  <img src="{% static 'default-trip.png' %}" alt="Default image" class="trip-img__image" />
+                {% endif %}
+                <!-- wishlist and its wrapper for the detailed trip -->
+                {% if user.is_authenticated %}
+                  <div class="wish-list-wrapper-dt">
+                    <img
+                      src="{% if trip in user.profile.favorites.all %}{% static 'heart-filled.png' %}{% else %}{% static 'heart-outline-white.png' %}{% endif %}"
+                      alt="Favorite"
+                      class="wish-list toggle-heart"
+                      data-trip-id="{{ trip.id }}"
+                      data-outline="{% static 'heart-outline-white.png' %}"
+                      data-filled="{% static 'heart-filled.png' %}"
+                    />
+                  </div>
+                {% endif %}
+              </div>
+
+              <p class="trip-title-dt">{{ trip.title }}</p>
+              <!-- Trip detailed info -->
+              <div class="trip-info-dt">
+                  <div class="part1">
+                      <div class="trip-date-start-dt">
+                        <img
+                          src="{% static 'calendar-check.png' %}"
+                          alt="calendar1"
+                          class="calendar1"
+                          style="width:20px; height:20px;margin-right:10px;"
+                        />Starts {{trip.trip_date_start|date:"d M"}}
+                      </div>
+                      <div class="trip-date-end-dt">
+                        <img
+                          src="{% static 'calendar-x.png' %}"
+                          alt="calendar2"
+                          class="calendar2"
+                          style="width:20px; height:20px;margin-right:10px;"
+                        />Ends {{trip.trip_date_end|date:"d M"}}
+                      </div>
+                      <div class="trip-duration-dt">
+                        <img
+                          src="{% static 'hourglass.png' %}"
+                          alt="hourglass"
+                          class="hourglass"
+                          style="width:20px; height:20px;margin-right:10px;"
+                        />Duration {{trip.trip_duration}} Days
+                      </div>
+                      <div class="trip-date-start-dt">
+                        <img
+                          src="{% static 'check.png' %}"
+                          alt="day1"
+                          class="day1"
+                          style="width:20px; height:20px;margin-right:10px;"
+                        />Day {{trip.trip_date_start|date:"l"}}
+                      </div>
+                  </div>
+              </div>
+              <div class="part2">
+                  <div class="trip-city-dt">
+                    <img
+                      src="{% static 'map-pin.png' %}"
+                      alt="map-pin"
+                      class="map-pin"
+                      style="width:20px; height:20px;margin-right:10px;"
+                    />City {{trip.city}}
+                  </div>
+                  <div class="trip-price-dt">
+                     EGP {{ trip.price|floatformat:"0"|intcomma }}
+                  </div>
+                  <div class="trip-city-dt">
+                    <img
+                      src="{% static 'users (2).png' %}"
+                      alt="max-persons"
+                      class="max-persons"
+                      style="width:20px; height:20px;margin-right:10px;"
+                    /> {{trip.max_persons}} MAX
+                  </div>
+                  <div class="trip-days-until">
+                    <img
+                      src="{% static 'days-until.png' %}"
+                      alt="days-until"
+                      class="days-until"
+                      style="width:20px; height:20px;margin-right:10px;"
+                    /> After {{trip.days_until_trip}} Day
+                  </div>
+              </div>
+
+             <!-- The description of the trip -->
+              <div class="trip-description-wrapper">
+                  <div class="trip-description">{{trip.description|linebreaksbr}}</div>
+              </div>
+
+              <!-- This is the contact info of the trip creator -->
+              <div class="social-media-trip">
+                {% if trip.creator.profile.has_any_contact %}
+                  {% if trip.creator.profile.facebook_url %}
+                    <a href="{{ trip.creator.profile.facebook_url }}" target="_blank">
+                      <img src="{% static 'facebook-icon.png' %}" alt="Facebook" style="width:24px; height:24px;">
+                    </a>
+                  {% endif %}
+
+                  {% if trip.creator.profile.instagram_url %}
+                    <a href="{{ trip.creator.profile.instagram_url }}" target="_blank">
+                      <img src="{% static 'instagram-icon.png' %}" alt="Instagram" style="width:24px; height:24px;">
+                    </a>
+                  {% endif %}
+
+                  {% if trip.creator.profile.whatsapp_number %}
+                    <a href="https://wa.me/{{ trip.creator.profile.whatsapp_number }}" target="_blank">
+                      <img src="{% static 'whatsapp-icon.png' %}" alt="WhatsApp" style="width:24px; height:24px;">
+                    </a>
+                  {% endif %}
+
+                  {% if trip.creator.profile.phone_number %}
+                    <a href="tel:{{ trip.creator.profile.phone_number }}">
+                      <img src="{% static 'phone-icon.png' %}" alt="Phone" style="width:24px; height:24px;">
+                    </a>
+                  {% endif %}
+                {% else %}
+                  <h3 class="no-contact-message">No contact available</h3>
+                {% endif %}
+              </div>
+
+  </div>
+</div>
+{% endblock %}
+
+
+{% block footer %}
+{% endblock %}

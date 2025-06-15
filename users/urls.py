@@ -7,4 +7,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'), # updated here
     path('profile/',views.profile_view,name='profile'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
+    path('favorites/', views.favorites_view, name='favorites'),
+
 ]

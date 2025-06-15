@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'trips',
     'users.apps.UsersConfig',
     'django_filters',
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [
@@ -79,8 +80,12 @@ WSGI_APPLICATION = 'go2trip.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'trip2go',
+        'USER': 'postgres',
+        'PASSWORD': '2691999Mm',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 

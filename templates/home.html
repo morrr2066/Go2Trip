@@ -5,40 +5,84 @@
 <div id="profile-trips">
   <ul id="home-trips-list">
     {% for trip in trips %}
-      <li class="trip-card" style="position: relative; padding-left: 80px;">
-
-        <strong>{{ trip.title }}</strong><br>
-        {{ trip.trip_date|date:"d/m/Y" }}<br>
-        {{ trip.price }} EGP<br>
-        {{ trip.destinations }}<br>
-        Contact: {{ trip.contact_info }}<br>
-        {{ trip.max_persons }}<br>
-        {{ trip.creator.first_name }}
-
-        <img
-          src="{{ trip.creator.profile.profile_picture.url|default:'' }}"
-          alt="Profile Picture"
-          style="
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid white;
-            position: absolute;
-            bottom: 180px;
-            left: -25px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
-          "
-          onerror="this.src='{% static 'user-circle.png' %}';"
-        />
-
-      </li>
+      {% include "partials/trip_card.html" with trip=trip %}
     {% empty %}
       <li>No trips available.</li>
     {% endfor %}
   </ul>
 </div>
 {% if user.is_authenticated %}
-  <a href="{% url 'create' %}" class="add-trip-button" title="Add Trip">+</a>
+  <button id="open-create-trip-modal" class="add-trip-button" title="Add Trip">+</button>
 {% endif %}
+<div id="create-trip-modal" style="display:none; position:fixed; top:0; left:0;
+    width:100%; height:100%; background:rgba(0,0,0,0.5);
+    justify-content:center; align-items:center;">
+  <div style="background:white; padding:20px; border-radius:8px; width:400px; position:relative;">
+    <button id="close-create-trip-modal" style="position:absolute; top:10px; right:10px;">X</button>
+    <h3>Create a Trip</h3>
+    <form id="create-trip-form" method="post" enctype="multipart/form-data" action="{% url 'create' %}">
+      {% csrf_token %}
+      {# Insert form fields here if 'form' exists #}
+      {% if form %}
+      {{ form.as_p }}
+
+      {% if form.errors %}
+        <div style="color: red;">
+          <ul>
+            {% for field in form %}
+              {% for error in field.errors %}
+
+              {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <button type="submit">Create Trip</button>
+    {% else %}
+      <!-- Form not loaded -->
+    {% endif %}
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script>
+    const openModalBtn = document.getElementById('open-create-trip-modal');
+    const modal = document.getElementById('create-trip-modal');
+    const closeModalBtn = document.getElementById('close-create-trip-modal');
+
+    openModalBtn.onclick = () => {
+      modal.style.display = 'flex';
+    }
+
+    closeModalBtn.onclick = () => {
+      modal.style.display = 'none';
+    }
+
+    window.onclick = (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    }
+    // Auto-open modal if form has errors
+    window.addEventListener('DOMContentLoaded', () => {
+      {% if form.errors %}
+        modal.style.display = 'flex';
+      {% endif %}
+    });
+
+    closeModalBtn.onclick = () => {
+      modal.style.display = 'none';
+      // Clear the form fields on close
+      document.getElementById('create-trip-form').reset();
+    }
+
+  </script>
 {% endblock %}

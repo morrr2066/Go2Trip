@@ -1,0 +1,99 @@
+{% load static %}
+{% load humanize %}
+
+
+<div class="trip-card" style="position: relative; padding-left: 80px;">
+
+<a href="{% url 'trip_details' trip.id %}" class="trip-card-link"></a>
+
+  <div class="trip-img">
+    {% if trip.trip_picture %}
+      <img src="{{ trip.trip_picture.url }}" alt="{{ trip.title }}" class="trip-img__image" />
+    {% else %}
+      <img src="{% static 'default-trip.png' %}" alt="Default image" class="trip-img__image" />
+    {% endif %}
+
+  </div>
+
+  {% if user.is_authenticated %}
+    <div class="wish-list-wrapper">
+    <img
+      src="{% if trip in user.profile.favorites.all %}{% static 'heart-filled.png' %}{% else %}{% static 'heart-outline-white.png' %}{% endif %}"
+      alt="Favorite"
+      class="wish-list toggle-heart"
+      data-trip-id="{{ trip.id }}"
+      data-outline="{% static 'heart-outline-white.png' %}"
+      data-filled="{% static 'heart-filled.png' %}"
+    />
+    </div>
+    {% endif %}
+
+
+{% if not hide_creator %}  <!-- Optional section -->
+<div class="by-creator">
+    <div class="trip-creator">{{ trip.creator.first_name }} {{ trip.creator.last_name }}</div>
+</div>
+{% endif %}
+
+  <p class="trip-title">{{ trip.title }}</p>
+
+
+  <div class="trip-info">
+    <div class="trip-date-start">
+      <img
+        src="{% static 'calendar-check.png' %}"
+        alt="calendar1"
+        class="calendar1"
+        style="width:20px; height:20px;"
+      />
+      {{trip.trip_date_start|date:"d M"}}</div>
+    <div class="trip-duration">
+      <img
+        src="{% static 'hourglass.png' %}"
+        alt="hourglass"
+        class="hourglass"
+        style="width:20px; height:20px;"
+      />
+      {{trip.trip_duration}} Days</div>
+    <div class="trip-city">
+      <img
+        src="{% static 'map-pin.png' %}"
+        alt="map-pin"
+        class="map-pin"
+        style="width:20px; height:20px;"
+      />
+      {{trip.city}}</div>
+  </div>
+
+
+
+
+    <div class="trip-price">
+        {{ trip.price|floatformat:"0"|intcomma }} EGP
+    </div>
+
+  {% if not hide_creator %}  <!-- Optional section -->
+
+  <img
+    src="{{ trip.creator.profile.profile_picture.url|default:'' }}"
+    alt="Profile Picture"
+    style="
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid white;
+      position: absolute;
+      top: 180px;
+      left: 880px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      background:white;
+    "
+    onerror="this.src='{% static 'user-circle.png' %}';"
+  />
+  {% endif %}
+  <!--
+  <div class="wish-list" >
+  </div>
+-->
+</div>

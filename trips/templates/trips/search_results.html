@@ -2,52 +2,24 @@
 {% load static %}
 
 {% block content %}
-  <h2>Search Results</h2>
+  <h2 class="search-results-h2">Search Results</h2>
 
-  <form method="get" style="max-width: 600px; margin: 1rem auto; text-align: center;">
-    {{ filter.form.as_p }}
-    <button type="submit" class="btn btn-light" style="padding: 0.5rem 1rem; font-weight: 600;">Filter</button>
-  </form>
 
-  <hr style="max-width: 600px; margin: 1rem auto; border-color: #ddd;">
+
+  <hr style="max-width: 800px; margin: 1rem auto; border-color: #ddd;">
 
   <div id="profile-trips" style="max-width: 1000px; margin: 2rem auto;">
     <ul id="home-trips-list">
       {% for trip in filter.qs %}
-        <li class="trip-card" style="position: relative; padding-left: 80px;">
-
-          <strong>{{ trip.title }}</strong><br>
-          {{ trip.trip_date|date:"d/m/Y" }}<br>
-          {{ trip.price }} EGP<br>
-          {{ trip.destinations }}<br>
-          Contact: {{ trip.contact_info }}<br>
-          Max Persons: {{ trip.max_persons }}<br>
-          {{ trip.creator.first_name }}
-
-          <img
-            src="{% if trip.creator.profile.profile_picture %}{{ trip.creator.profile.profile_picture.url }}{% else %}{% static 'user-circle.png' %}{% endif %}"
-            alt="Profile Picture"
-            class="profile-pic"
-            style="
-              position: absolute;
-              bottom: 180px;
-              left: -25px;
-              width: 55px;
-              height: 55px;
-              border: 2px solid white;
-              box-shadow: 0 0 5px rgba(0,0,0,0.2);
-            "
-            onerror="this.src='{% static 'user-circle.png' %}';"
-          />
-
-        </li>
+        {% include "partials/trip_card.html" with trip=trip %}
       {% empty %}
         <li>No trips found.</li>
       {% endfor %}
     </ul>
   </div>
 
-  {% if user.is_authenticated %}
-    <a href="{% url 'create' %}" class="add-trip-button" title="Add Trip">+</a>
-  {% endif %}
+
+{% endblock %}
+
+{% block h2 %}
 {% endblock %}

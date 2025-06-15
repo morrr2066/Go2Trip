@@ -4,15 +4,21 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 class SignUpForm(UserCreationForm):
-    first_name = forms.CharField(widget=forms.TextInput(attrs={
+    first_name = forms.CharField(
+        max_length=30,
+        widget=forms.TextInput(attrs={
         "class": "form-control",
         "placeholder": "Enter first name"
     }))
-    last_name = forms.CharField(widget=forms.TextInput(attrs={
+    last_name = forms.CharField(
+        max_length=30,
+        widget=forms.TextInput(attrs={
         "class": "form-control",
         "placeholder": "Enter last name"
     }))
-    email = forms.EmailField(widget=forms.EmailInput(attrs={
+    email = forms.EmailField(
+        max_length=100,
+        widget=forms.EmailInput(attrs={
         "class": "form-control",
         "placeholder": "Enter email"
     }))
